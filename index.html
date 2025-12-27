@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTOS 系统开机</title>
+    <link rel="stylesheet" href="c.css">
+</head>
+<body>
+    <div class="boot-screen">
+        <div class="logo-container">
+            <h1 class="logo">HTOS</h1>
+            <p class="version">版本 2024</p>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+            <div class="progress-text">0%</div>
+        </div>
+        
+        <div class="status-text">正在启动系统...</div>
+        <div class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+    
+    <!-- 蓝屏 -->
+    <div class="blue-screen" id="blueScreen" style="display: none;">
+        <div class="bsod-content">
+            <div class="bsod-emoji">💻</div>
+            <h1>你的电脑遇到问题，需要重新启动。</h1>
+            <p>我们正在收集一些错误信息，然后你可以重新启动。</p>
+            <p><span class="error-code">错误代码: 78x9137891</span></p>
+            <div class="bsod-progress">
+                <div class="bsod-progress-bar" id="bsodProgressBar"></div>
+            </div>
+            <p class="progress-text">正在修复... 0%</p>
+        </div>
+    </div>
+    
+    <!-- 第一次开机选择界面 -->
+    <div class="setup-screen" id="firstBootScreen">
+        <div class="setup-container">
+            <div class="setup-header">
+                <h2 class="setup-title">欢迎使用 HTOS</h2>
+                <p class="setup-subtitle">这是您第一次使用 HTOS 吗？</p>
+            </div>
+            <div class="setup-buttons" style="margin-top: 40px;">
+                <button type="button" class="btn btn-secondary" id="notFirstBootBtn">不是，我之前使用过</button>
+                <button type="button" class="btn btn-primary" id="firstBootBtn">是的，这是第一次</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 产品密钥输入界面 -->
+    <div class="setup-screen" id="keyScreen">
+        <div class="setup-container">
+            <div class="setup-header">
+                <h2 class="setup-title">产品密钥</h2>
+                <p class="setup-subtitle">请输入您的 HTOS 产品密钥以继续</p>
+            </div>
+            <form class="setup-form" id="keyForm">
+                <div class="form-group">
+                    <label for="productKey">产品密钥</label>
+                    <input type="text" id="productKey" name="productKey" placeholder="格式：XXXXX-XXXXX-XXXXX-XXXXX" required>
+                </div>
+                <div class="setup-buttons">
+                    <button type="button" class="btn btn-secondary" id="skipKeyBtn">暂时跳过</button>
+                    <button type="submit" class="btn btn-primary" id="nextBtn">下一步</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 注册账号界面 -->
+    <div class="setup-screen" id="setupScreen">
+        <div class="setup-container">
+            <div class="setup-header">
+                <h2 class="setup-title">创建账户</h2>
+                <p class="setup-subtitle">创建您的账户以开始使用 HTOS</p>
+            </div>
+            <form class="setup-form" id="setupForm">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" placeholder="请输入用户名" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">电子邮箱</label>
+                    <input type="email" id="email" name="email" placeholder="请输入电子邮箱" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" placeholder="请输入密码" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">确认密码</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="请再次输入密码" required>
+                </div>
+                <div class="setup-buttons">
+                    <button type="button" class="btn btn-secondary" id="skipBtn">稍后设置</button>
+                    <button type="submit" class="btn btn-primary" id="createBtn">创建账户</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 桌面界面 -->
+    <div class="desktop" id="desktop">
+        <!-- 壁纸背景 -->
+        <div class="wallpaper"></div>
+        
+        <!-- 桌面图标 -->
+        <div class="desktop-icons">
+            <div class="desktop-icon">
+                <div class="icon-img" style="background: linear-gradient(45deg, #00ccff, #0099ff);"></div>
+                <div class="icon-label">此电脑</div>
+            </div>
+            <div class="desktop-icon">
+                <div class="icon-img" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24);"></div>
+                <div class="icon-label">回收站</div>
+            </div>
+            <div class="desktop-icon">
+                <div class="icon-img" style="background: linear-gradient(45deg, #48dbfb, #0abde3);"></div>
+                <div class="icon-label">浏览器</div>
+            </div>
+            <div class="desktop-icon">
+                <div class="icon-img" style="background: linear-gradient(45deg, #ff9ff3, #f368e0);"></div>
+                <div class="icon-label">设置</div>
+            </div>
+        </div>
+        
+        <!-- 任务栏 -->
+        <div class="taskbar">
+            <div class="taskbar-start" id="startButton">
+                    <span class="start-icon">⊞</span>
+                </div>
+            <div class="taskbar-center">
+                <div class="taskbar-item active">
+                    <span class="taskbar-icon">📁</span>
+                    <span class="taskbar-label">文件资源管理器</span>
+                </div>
+            </div>
+            <div class="taskbar-right">
+                <div class="system-tray">
+                    <span class="tray-icon">🔊</span>
+                    <span class="tray-icon">🔋</span>
+                    <span class="tray-icon">📶</span>
+                </div>
+                <div class="clock" id="clock"></div>
+            </div>
+        </div>
+        
+        <!-- 开始菜单 -->
+        <div class="start-menu" id="startMenu">
+            <div class="start-menu-content">
+                <div class="start-menu-left">
+                    <div class="user-profile">
+                        <div class="user-avatar">👤</div>
+                        <div class="user-info">
+                            <div class="user-name">用户</div>
+                            <div class="user-email">user@htos.com</div>
+                        </div>
+                    </div>
+                    <div class="app-list">
+                        <div class="app-item">
+                            <div class="app-icon">📁</div>
+                            <div class="app-info">
+                                <div class="app-name">文件资源管理器</div>
+                                <div class="app-shortcut">Win+E</div>
+                            </div>
+                        </div>
+                        <div class="app-item">
+                            <div class="app-icon">🌐</div>
+                            <div class="app-info">
+                                <div class="app-name">浏览器</div>
+                                <div class="app-shortcut">Win+B</div>
+                            </div>
+                        </div>
+                        <div class="app-item">
+                            <div class="app-icon">⚙️</div>
+                            <div class="app-info">
+                                <div class="app-name">设置</div>
+                                <div class="app-shortcut">Win+I</div>
+                            </div>
+                        </div>
+                        <div class="app-item">
+                            <div class="app-icon">📝</div>
+                            <div class="app-info">
+                                <div class="app-name">记事本</div>
+                                <div class="app-shortcut">Win+N</div>
+                            </div>
+                        </div>
+                        <div class="app-item">
+                            <div class="app-icon">🖼️</div>
+                            <div class="app-info">
+                                <div class="app-name">照片</div>
+                                <div class="app-shortcut">Win+P</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="start-menu-right">
+                    <div class="power-options">
+                        <div class="power-option">
+                            <div class="power-icon">🔒</div>
+                            <div class="power-label">锁定</div>
+                        </div>
+                        <div class="power-option">
+                            <div class="power-icon">⇧</div>
+                            <div class="power-label">切换用户</div>
+                        </div>
+                        <div class="power-option">
+                            <div class="power-icon">⚡</div>
+                            <div class="power-label">睡眠</div>
+                        </div>
+                        <div class="power-option">
+                            <div class="power-icon">⏸️</div>
+                            <div class="power-label">休眠</div>
+                        </div>
+                        <div class="power-option">
+                            <div class="power-icon">🔄</div>
+                            <div class="power-label">重启</div>
+                        </div>
+                        <div class="power-option">
+                            <div class="power-icon">🚪</div>
+                            <div class="power-label">关机</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 文件资源管理器窗口 -->
+        <div class="window" id="explorerWindow">
+            <div class="window-header">
+                <div class="window-title">
+                    <span class="window-icon">📁</span>
+                    <span>文件资源管理器</span>
+                </div>
+                <div class="window-controls">
+                    <button class="window-btn minimize">_</button>
+                    <button class="window-btn maximize">□</button>
+                    <button class="window-btn close">✕</button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="explorer-sidebar">
+                    <div class="sidebar-section">
+                        <div class="sidebar-title">快速访问</div>
+                        <div class="sidebar-item active">
+                            <span class="sidebar-icon">🏠</span>
+                            <span>主页</span>
+                        </div>
+                        <div class="sidebar-item">
+                            <span class="sidebar-icon">⭐</span>
+                            <span>收藏夹</span>
+                        </div>
+                        <div class="sidebar-item">
+                            <span class="sidebar-icon">📂</span>
+                            <span>最近访问</span>
+                        </div>
+                    </div>
+                    <div class="sidebar-section">
+                        <div class="sidebar-title">此电脑</div>
+                        <div class="sidebar-item">
+                            <span class="sidebar-icon">💽</span>
+                            <span>本地磁盘 (C:)</span>
+                        </div>
+                        <div class="sidebar-item">
+                            <span class="sidebar-icon">💽</span>
+                            <span>本地磁盘 (D:)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="explorer-main">
+                    <div class="toolbar">
+                            <div class="toolbar-buttons">
+                                <button class="toolbar-btn">🔙</button>
+                                <button class="toolbar-btn">🔜</button>
+                                <button class="toolbar-btn">🏠</button>
+                                <button class="toolbar-btn" id="deleteBtn">🗑️</button>
+                            </div>
+                        <div class="address-bar">
+                            <span class="address-part">此电脑</span>
+                            <span class="address-separator">></span>
+                            <span class="address-part">主页</span>
+                        </div>
+                    </div>
+                    <div class="file-list">
+                        <div class="file-item">
+                            <div class="file-icon">📄</div>
+                            <div class="file-info">
+                                <div class="file-name">文档.txt</div>
+                                <div class="file-details">文本文件 • 2KB</div>
+                            </div>
+                        </div>
+                        <div class="file-item">
+                            <div class="file-icon">🖼️</div>
+                            <div class="file-info">
+                                <div class="file-name">图片.jpg</div>
+                                <div class="file-details">JPEG 图像 • 1.2MB</div>
+                            </div>
+                        </div>
+                        <div class="file-item">
+                            <div class="file-icon">📁</div>
+                            <div class="file-info">
+                                <div class="file-name">下载</div>
+                                <div class="file-details">文件夹</div>
+                            </div>
+                        </div>
+                        <div class="file-item">
+                            <div class="file-icon">📁</div>
+                            <div class="file-info">
+                                <div class="file-name">文档</div>
+                                <div class="file-details">文件夹</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 浏览器窗口 -->
+        <div class="window" id="browserWindow">
+            <div class="window-header">
+                <div class="window-title">
+                    <span class="window-icon">🌐</span>
+                    <span>浏览器</span>
+                </div>
+                <div class="window-controls">
+                    <button class="window-btn minimize">_</button>
+                    <button class="window-btn maximize">□</button>
+                    <button class="window-btn close">✕</button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="browser-toolbar">
+                    <div class="toolbar-buttons">
+                        <button class="toolbar-btn" id="browserBack">🔙</button>
+                        <button class="toolbar-btn" id="browserForward">🔜</button>
+                        <button class="toolbar-btn" id="browserRefresh">🔄</button>
+                        <button class="toolbar-btn" id="browserHome">🏠</button>
+                    </div>
+                    <div class="browser-address-bar">
+                        <input type="text" id="browserAddress" placeholder="输入网址..." value="https://www.example.com">
+                        <button id="browserGo">🔍</button>
+                    </div>
+                </div>
+                <div class="browser-content" id="browserContent">
+                    <div class="browser-loading">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">正在加载...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 设置窗口 -->
+        <div class="window" id="settingsWindow">
+            <div class="window-header">
+                <div class="window-title">
+                    <span class="window-icon">⚙️</span>
+                    <span>设置</span>
+                </div>
+                <div class="window-controls">
+                    <button class="window-btn minimize">_</button>
+                    <button class="window-btn maximize">□</button>
+                    <button class="window-btn close">✕</button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="settings-sidebar">
+                    <div class="settings-section">
+                        <div class="settings-item active" data-section="system">
+                            <span class="settings-icon">🖥️</span>
+                            <span>系统</span>
+                        </div>
+                        <div class="settings-item" data-section="personalization">
+                            <span class="settings-icon">🎨</span>
+                            <span>个性化</span>
+                        </div>
+                        <div class="settings-item" data-section="network">
+                            <span class="settings-icon">📶</span>
+                            <span>网络</span>
+                        </div>
+                        <div class="settings-item" data-section="accounts">
+                            <span class="settings-icon">👤</span>
+                            <span>账户</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-main">
+                    <div class="settings-content" id="settingsSystem">
+                        <h2>系统</h2>
+                        <div class="settings-group">
+                            <div class="settings-label">系统信息</div>
+                            <div class="settings-value">HTOS 版本 1.0</div>
+                        </div>
+                        <div class="settings-group">
+                            <div class="settings-label">处理器</div>
+                            <div class="settings-value">虚拟处理器</div>
+                        </div>
+                        <div class="settings-group">
+                            <div class="settings-label">内存</div>
+                            <div class="settings-value">8 GB</div>
+                        </div>
+                    </div>
+                    <div class="settings-content" id="settingsPersonalization" style="display: none;">
+                        <h2>个性化</h2>
+                        <div class="settings-group">
+                            <div class="settings-label">主题</div>
+                            <div class="settings-options">
+                                <button class="theme-option active" data-theme="dark">深色</button>
+                                <button class="theme-option" data-theme="light">浅色</button>
+                            </div>
+                        </div>
+                        <div class="settings-group">
+                            <div class="settings-label">桌面背景</div>
+                            <div class="settings-value">默认背景</div>
+                        </div>
+                    </div>
+                    <div class="settings-content" id="settingsNetwork" style="display: none;">
+                        <h2>网络</h2>
+                        <div class="settings-group">
+                            <div class="settings-label">网络状态</div>
+                            <div class="settings-value">已连接</div>
+                        </div>
+                        <div class="settings-group">
+                            <div class="settings-label">Wi-Fi</div>
+                            <div class="settings-value">HTOS-Network</div>
+                        </div>
+                    </div>
+                    <div class="settings-content" id="settingsAccounts" style="display: none;">
+                        <h2>账户</h2>
+                        <div class="settings-group">
+                            <div class="settings-label">用户名</div>
+                            <div class="settings-value">用户</div>
+                        </div>
+                        <div class="settings-group">
+                            <div class="settings-label">电子邮件</div>
+                            <div class="settings-value">user@htos.com</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 记事本窗口 -->
+        <div class="window" id="notepadWindow">
+            <div class="window-header">
+                <div class="window-title">
+                    <span class="window-icon">📝</span>
+                    <span>记事本</span>
+                </div>
+                <div class="window-controls">
+                    <button class="window-btn minimize">_</button>
+                    <button class="window-btn maximize">□</button>
+                    <button class="window-btn close">✕</button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="notepad-toolbar">
+                    <button class="notepad-btn" id="notepadNew">新建</button>
+                    <button class="notepad-btn" id="notepadOpen">打开</button>
+                    <button class="notepad-btn" id="notepadSave">保存</button>
+                </div>
+                <textarea id="notepadText" class="notepad-textarea" placeholder="在此输入文本..."></textarea>
+            </div>
+        </div>
+        
+        <!-- 照片窗口 -->
+        <div class="window" id="photosWindow">
+            <div class="window-header">
+                <div class="window-title">
+                    <span class="window-icon">🖼️</span>
+                    <span>照片</span>
+                </div>
+                <div class="window-controls">
+                    <button class="window-btn minimize">_</button>
+                    <button class="window-btn maximize">□</button>
+                    <button class="window-btn close">✕</button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="photos-toolbar">
+                    <button class="photos-btn" id="photosPrevious">◀ 上一张</button>
+                    <button class="photos-btn" id="photosNext">下一张 ▶</button>
+                    <button class="photos-btn" id="photosSlideshow">幻灯片</button>
+                </div>
+                <div class="photos-content">
+                    <div class="photos-gallery" id="photosGallery">
+                        <!-- 示例图片 -->
+                        <div class="photo-item" data-src="BHGGHJDECGFJF-qXTv1N3NUp.png" data-index="0">
+                            <img src="BHGGHJDECGFJF-qXTv1N3NUp.png" alt="示例图片">
+                        </div>
+                    </div>
+                    <div class="photos-viewer" id="photosViewer">
+                        <div class="viewer-content" id="viewerContent">
+                            <div class="viewer-info">点击图片查看大图</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 回收站窗口 -->
+    <div class="window" id="recycleBinWindow" style="width: 800px; height: 600px; left: 100px; top: 100px; display: none;">
+        <div class="window-header">
+            <div class="window-title">
+                <span class="window-icon">🗑️</span>
+                <span>回收站</span>
+            </div>
+            <div class="window-controls">
+                <button class="window-btn minimize">_</button>
+                <button class="window-btn maximize">□</button>
+                <button class="window-btn close">✕</button>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="recycle-bin-toolbar">
+                <button id="restoreSelected" class="recycle-bin-btn">恢复所选项目</button>
+                <button id="emptyRecycleBin" class="recycle-bin-btn">清空回收站</button>
+            </div>
+            <div class="recycle-bin-content">
+                <div class="recycle-bin-list" id="recycleBinList">
+                    <!-- 回收站内容将通过JavaScript动态添加 -->
+                </div>
+                <div class="recycle-bin-empty" id="recycleBinEmpty" style="display: none;">
+                    <div class="empty-icon">🗑️</div>
+                    <div class="empty-text">回收站是空的</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右键菜单 -->
+    <div class="context-menu" id="contextMenu" style="display: none;">
+        <div class="context-menu-item" id="cm-new">新建</div>
+        <div class="context-menu-item" id="cm-view">查看</div>
+        <div class="context-menu-item" id="cm-sort">排序方式</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" id="cm-refresh">刷新</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" id="cm-personalize">个性化</div>
+    </div>
+    </div>
+    
+    <script src="main.js"></script>
+</body>
+</html>
